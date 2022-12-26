@@ -26,7 +26,6 @@ const client = new Client({
 client.connect();
 
 app.get('/records', (req, res) => {
-  const id = req.query.id;
   client.query('SELECT * FROM records', (err, result) => {
     if (err) {
       console.error(err);
@@ -39,7 +38,17 @@ app.get('/records', (req, res) => {
 
 app.post('/records', (req, res) => {
   const id = req.query.id;
-  res.send(id);
+  const { name, totalRounds, record } = req.body;
+  const query = `INSERT INTO records (id, name, totalrounds, record) VALUES (${id}, ${name}, ${totalRounds}, ${record})`;
+  client.query(query, values, (err, result) => {
+    if (err) {
+      console.error(err);
+      res.status(500).send('Error');
+    } else {
+      console.log(result);
+      res.send('Records updated');
+    }
+  });
 });
 
 app.put('/user', (req, res) => {
