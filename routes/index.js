@@ -25,6 +25,17 @@ const client = new Client({
 
 client.connect();
 
+app.get('/routines', (req, res) => {
+  client.query('SELECT * FROM routines', (err, result) => {
+    if (err) {
+      console.error(err);
+      res.status(500).send('Error fetching records');
+    } else {
+      res.send(result.rows);
+    }
+  });
+});
+
 app.get('/records', (req, res) => {
   client.query('SELECT * FROM records', (err, result) => {
     if (err) {
@@ -36,10 +47,27 @@ app.get('/records', (req, res) => {
   });
 });
 
+app.post('/routines', (req, res) => {
+  const { name, totalrounds } = req.body;
+  const values = [name, totalrounds];
+  const query = 'INSERT INTO routines (name, totalrounds) VALUES ($1, $2)';
+  client.query(query, values, (err, result) => {
+    if (err) {
+      console.error(err);
+      res.status(500).send('Error');
+    } else {
+      console.log(result);
+      res.send('Records updated');
+    }
+  });
+});
+
 app.post('/records', (req, res) => {
-  const id = req.query.id;
-  const { name, totalRounds, record } = req.body;
-  const query = `INSERT INTO records (id, name, totalrounds, record) VALUES (${id}, ${name}, ${totalRounds}, ${record})`;
+  const routine_id = req.query.id;
+  const { count, weight } = req.body;
+  const values = [routine_id, count, weight];
+  const query =
+    'INSERT INTO records (routine_id, count, weight) VALUES ($1, $2, $3)';
   client.query(query, values, (err, result) => {
     if (err) {
       console.error(err);
