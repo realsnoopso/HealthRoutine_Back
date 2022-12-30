@@ -37,12 +37,16 @@ app.get('/routines', (req, res) => {
 });
 
 app.get('/records', (req, res) => {
+  const routine_id = Number(req.query.id);
   client.query('SELECT * FROM records', (err, result) => {
     if (err) {
       console.error(err);
       res.status(500).send('Error fetching records');
     } else {
-      res.send(result.rows);
+      const records = result.rows.filter(
+        (record) => record.routine_id === routine_id
+      );
+      res.send(records);
     }
   });
 });
